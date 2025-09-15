@@ -1,33 +1,55 @@
 version: '3.8'
+
 services:
   app:
     build:
       context: .
       dockerfile: Dockerfile
-    ports:
-      - "8092:8092"
+    image: app:v6
+    container_name: app-v6
     environment:
       - PORT=8092
+      - STU_ID=220009
+      - STU_GROUP=as-63
+      - STU_VARIANT=06
+      - POSTGRES_HOST=db-v6
+      - POSTGRES_PORT=5432
+      - POSTGRES_USER=appuser
+      - POSTGRES_PASSWORD=apppass
+      - POSTGRES_DB=app_220009_v6
+    labels:
+      - org.bstu.owner=Frosyka
+      - org.bstu.student.slug=as-63-220009-v06
+    networks:
+      - net-v6
     depends_on:
-      postgres:
+      db:
         condition: service_healthy
-    healthcheck:
-      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://127.0.0.1:8092/health"]
-      interval: 30s
-      timeout: 3s
-      retries: 3
-  postgres:
-    image: postgres:16
+
+  db:
+    image: postgres:16-alpine
+    container_name: db-v6
     environment:
-      - POSTGRES_USER=app_user
-      - POSTGRES_PASSWORD=app_password
-      - POSTGRES_DB=app_db
+      - POSTGRES_USER=appuser
+      - POSTGRES_PASSWORD=apppass
+      - POSTGRES_DB=app_220009_v6
     volumes:
-      - postgres_data:/var/lib/postgresql/data
+      - data_v6:/var/lib/postgresql/data
+    labels:
+      - org.bstu.owner=Frosyka
+      - org.bstu.student.slug=as-63-220009-v06
+    networks:
+      - net-v6
     healthcheck:
-      test: ["CMD", "pg_isready", "-U", "app_user"]
+      test: ["CMD-SHELL", "pg_isready -U appuser -d app_220009_v6"]
       interval: 10s
       timeout: 5s
       retries: 5
+      start_period: 10s
+
 volumes:
-  postgres_data:
+  data_v6:
+
+networks:
+  net-v6:
+    driver: bridge
