@@ -11,8 +11,8 @@ README.md - Документация проекта.
 
 Требования
 
-Docker
-Docker Compose
+- Docker
+- Docker Compose
 
 Как запустить
 
@@ -23,8 +23,8 @@ Docker Compose
 
 Чтобы вручную построить Docker-image:
 ```docker build -t go-server .
-docker run -p 8080:8080 go-server```
-
+docker run -p 8080:8080 go-server
+```
 
 
 Endpoints
@@ -36,6 +36,7 @@ Graceful Shutdown
 Сервер поддерживает graceful shutdown, ожидая сигнала типа SIGNIT или SIGTERM, позволяя системе закончить все запросы в течении 5 секунд. Для теста, пошлите какой-либо SIGTERM-сигнал (например Ctrl+C в консоли) и ожидайте "Shutting down server..." и "Server exiting" в коносли.
 
 Student Metadata
+```
 Full Name: Карпеш Никита Петрович
 Group: АС-63
 Student ID: 220009
@@ -45,3 +46,4 @@ Variant №: 6
 Completion Date: 15/09/2025
 Operating System: Windows 10 Pro 22H2, Ubuntu 22.04
 Docker Version: Docker Desktop 4.45.0 / Engine 28.3.3
+```
