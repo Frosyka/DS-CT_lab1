@@ -1,15 +1,16 @@
-# Stage 1: Сборка приложения
-FROM golang:1.23-alpine AS build
+FROM golang:1.22-alpine AS builder
 WORKDIR /app
 COPY src/server.go .
-RUN CGO_ENABLED=0 GOOS=linux go build -o server server.go
+RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o server server.go
 
-# Stage 2: Финальный минималистичный образ
-FROM gcr.io/distroless/static-debian12
+FROM alpine:3.20
+RUN adduser -D -u 10001 nonroot
 WORKDIR /app
-USER nonroot:nonroot
-COPY --from=build /app/server /app/server
-EXPOSE 8080
-ENV PORT=8080
-HEALTHCHECK --interval=30s --timeout=3s CMD ["/bin/wget", "--quiet", "--tries=1", "--spider", "http://127.0.0.1:${PORT}/health"]
-ENTRYPOINT ["/app/server"]
+COPY --from=builder /app/server .
+RUN chown nonroot:nonroot /app/server
+USER nonroot
+ENV PORT=8092
+EXPOSE $PORT
+HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
+  CMD wget --no-verbose --tries=1 --spider http://localhost:$PORT/health || exit 1
+CMD ["./server"]
